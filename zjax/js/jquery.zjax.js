@@ -152,22 +152,12 @@
         }
 
         //初始化ajax方法
-        //注意：禁止对ajax的xhr方法初始化！！！！！！
-        //@See 下面的ajax源代码片段，初始化会造成xhr对象的open的配置项为undefined
-        //if ( support.cors || xhrSupported && !options.crossDomain ) {
-        // 		return {
-        // 			send: function( headers, complete ) {
-        // 				var i,
-        // 					xhr = options.xhr();
-        //
-        // 				xhr.open(
-        // 					options.type,
-        // 					options.url,
-        // 					options.async,
-        // 					options.username,
-        // 					options.password
-        // 				);
-
+        //注意：尽量不要对ajax的xhr方法初始化。初始化也可以，必须将xhr对象还给JQuery，就像我这么干
+        if (config.xhr === undefined) {
+            config.xhr = function () {
+                return $.ajaxSettings.xhr();
+            }
+        }
         if (config.beforeSend === undefined) {
             config.beforeSend = function () {
                 me._debug("请求开始")
