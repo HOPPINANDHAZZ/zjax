@@ -185,11 +185,11 @@
             }
         }
 
-        if(config.roundUrl!=null){
-            config.storageCache=false;
-            config.isLoading=false;
-            config.lockRequest=false;
-            config.blockRequest=false;
+        if (config.roundUrl != null) {
+            config.storageCache = false;
+            config.isLoading = false;
+            config.lockRequest = false;
+            config.blockRequest = false;
         }
         return config;
     }
@@ -304,7 +304,7 @@
     }
 
     /**
-     * 开启缓存
+     * 开启缓存,只有响应里code为20x和304才缓存
      * @param config
      * @returns {string|boolean}
      */
@@ -317,17 +317,20 @@
             case "localStorage":
                 if (!localStorage.getItem(cacheKey)) {
                     config.success = config.success.__$zq_fn_after(function (rep) {
-                        //缓存类型是localStorage的情况，存储返回值的base64码
-                        let blob = new Blob([JSON.stringify(rep)]);
-                        let reader = new window.FileReader();
-                        reader.readAsDataURL(blob);
-                        reader.onloadend = function () {
-                            localStorage.setItem(cacheKey, reader.result.toString());
+                        if ((200 <= rep.code && rep.code < 300) || rep.code == 304) {
+                            //缓存类型是localStorage的情况，存储返回值的base64码
+                            let blob = new Blob([JSON.stringify(rep)]);
+                            let reader = new window.FileReader();
+                            reader.readAsDataURL(blob);
+                            reader.onloadend = function () {
+                                localStorage.setItem(cacheKey, reader.result.toString());
+                            }
+                            me.cache.localStorage.push({
+                                "cacheKey": cacheKey,
+                                "cacheTime": new Date().getTime().toString()
+                            })
                         }
-                        me.cache.localStorage.push({
-                            "cacheKey": cacheKey,
-                            "cacheTime": new Date().getTime().toString()
-                        })
+
                     });
                     return false;
                 } else {
@@ -338,14 +341,16 @@
             default:
                 if (!sessionStorage.getItem(cacheKey)) {
                     config.success = config.success.__$zq_fn_after(function (rep) {
-                        //缓存类型是sessionStorage的情况，存储返回值的URL对象，这是因为sessionStorage的生命周期是一次会话，而URL对象会随着
-                        //用户刷新页面而被垃圾回收，此时sessionStorage也因会话结束被清除
-                        let blobUrl = window.URL.createObjectURL(new Blob([JSON.stringify(rep)]));
-                        sessionStorage.setItem(cacheKey, blobUrl);
-                        me.cache.sessionStorage.push({
-                            "cacheKey": cacheKey,
-                            "cacheTime": new Date().getTime().toString()
-                        })
+                        if ((200 <= rep.code && rep.code < 300) || rep.code == 304) {
+                            //缓存类型是sessionStorage的情况，存储返回值的URL对象，这是因为sessionStorage的生命周期是一次会话，而URL对象会随着
+                            //用户刷新页面而被垃圾回收，此时sessionStorage也因会话结束被清除
+                            let blobUrl = window.URL.createObjectURL(new Blob([JSON.stringify(rep)]));
+                            sessionStorage.setItem(cacheKey, blobUrl);
+                            me.cache.sessionStorage.push({
+                                "cacheKey": cacheKey,
+                                "cacheTime": new Date().getTime().toString()
+                            })
+                        }
                     });
                     return false;
                 } else {
@@ -478,11 +483,11 @@
      * 注意：轮询会禁用遮罩、缓存，不会被自己阻塞，也不会被锁定请求
      * @param config
      */
-    _Zjax.prototype.startRound=function(config){
+    _Zjax.prototype.startRound = function (config) {
         if (config.roundUrl != null) {
             config.url = config.roundUrl;
 
-            zinterval(function(id) {
+            zinterval(function (id) {
                 $.ajax(config);
                 //通过id关闭定时器
             }, config.roundTime)
