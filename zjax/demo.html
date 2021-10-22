@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/cybr.css">
+</head>
+<style>
+    .preloader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 999999;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-image: url(preloader.svg);
+        display: none;
+    }
+
+    ul {
+        list-style: none;
+    }
+</style>
+<body>
+<form enctype="multipart/form-data" class="ajax-form" name="videoForm"  method="post" action="http://127.0.0.1/video/videoTestUp">
+    <input id="video" type="file" name="video" required="" multiple=true>
+    <button type="submit">上传</button>
+</form>
+<button id="btn1">dianwo</button>
+<div id="div1"></div>
+</body>
+
+<script src="js/jquery-3.3.1.js"></script>
+<!--<script src="js/ajaxProxy.js"></script>-->
+<script src="js/jquery.zjax.js"></script>
+<script>
+
+    $(function () {
+
+        $.setZjaxSettings({
+            statusCode: {
+                404: function () {
+                    //没有服务
+                },
+                500: function () {
+                    //服务端失败
+                },
+                200: function () {
+                    //成功
+                },
+                302: function (data) {
+                    //重定向
+                },
+                304: function (data) {
+                    //缓存
+                },
+                0: function (data) {
+                    //请求被abort方法终止
+                }
+            }
+        });
+        $("#btn1").click(function () {
+            $.zjax({
+                url: "http://49.234.11.224/video/queryVideoClassify",
+                type: "post",
+                storageCache: true,
+                cacheType: "localStorage",
+                success: function (data) {
+                    console.log(data);
+                }
+            })
+        })
+        $("#div1").zjax({
+            url: "http://49.234.11.224/video/queryVideoClassify",
+            type: "post",
+            isLoading: true,
+            success: function (data) {
+                if (data.code === 200) data = data.data;
+                let $ul = $("<ul></ul>");
+                $.each(data, function (index, value) {
+                    $("<li></li>").append(`<button class="cybr-btn" data-miaoshu="${value.video_fenlei_miaoshu}">
+                                              ${value.video_fenlei_name}
+                                              <span aria-hidden>_</span>
+                                              <span aria-hidden class="cybr-btn__glitch">${value.video_fenlei_name}</span>
+                                              <span aria-hidden class="cybr-btn__tag">NO.${index}</span>
+                                            </button>`).attr("title", value.video_fenlei_miaoshu)
+                        .css({
+                            "padding": "25px",
+                            "cursor": "pointer"
+                        }).data("id", value.video_fenlei_id).appendTo($ul);
+                });
+                this.$dom.append($ul).on("click", function (event) {
+                    if (event.target.tagName.toLowerCase() === 'button') {
+                        alert($(event.target).data("miaoshu"));
+                        $(event.target).toggle(1000).delay(50).toggle(1000);
+                    }
+                })
+            }
+        })
+
+        $('.ajax-form').on('submit', function (e) {
+            e.preventDefault();//阻止ajax上传文件跳转
+            let $form = $(this);
+            let formData = new FormData($form[0]);
+            let action = $form.attr('action');
+            let method = $form.attr('method');
+            $.zjax({
+                type: method,
+                url: action,
+                data: formData,
+                processData: false,
+                contentType: false,
+                isProgress:true,
+                success: function (data) {
+                    alert("上传成功")
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert("服务器错误,请重新上传");
+                }
+            });
+        });
+
+
+        //
+        // $.zjax({
+        //     url:"http://49.234.11.224/video/queryVideoClassify",
+        //     type: "post",
+        //     blockRequest:true,
+        //     blockName:"qwe",
+        //     success: function (data) {
+        //         console.log(1);
+        //     }
+        // })
+        // $.zjax({
+        //     url:"http://49.234.11.224/video/queryVideoClassify",
+        //     type: "post",
+        //     blockRequest:true,
+        //     blockName:"qwe",
+        //     success: function (data) {
+        //         console.log(2);
+        //     }
+        // })
+        // $.zjax({
+        //     url:"http://49.234.11.224/video/queryVideoClassify",
+        //     type: "post",
+        //     blockRequest:true,
+        //     blockName:"qwe",
+        //     success: function (data) {
+        //         console.log(3);
+        //     }
+        // })
+        // $.zjax({
+        //     url:"http://49.234.11.224/video/queryVideoClassify",
+        //     type: "post",
+        //     blockRequest:true,
+        //     blockName:"qwe",
+        //     success: function (data) {
+        //         console.log(4);
+        //     }
+        // })
+
+
+        // ajaxProxy.blockReq({
+        //     url:"http://49.234.11.224/video/queryVideoClassify",
+        //     type: "post",
+        //     blockRequest:true,
+        //     blockName:"qwe",
+        //     success: function (data) {
+        //         console.log(1);
+        //     }
+        // })
+        // ajaxProxy.blockReq({
+        //     url:"http://49.234.11.224/video/queryVideoClassify",
+        //     type: "post",
+        //     blockRequest:true,
+        //     blockName:"qwe",
+        //     success: function (data) {
+        //         console.log(2);
+        //     }
+        // })
+        // ajaxProxy.blockReq({
+        //     url:"http://49.234.11.224/video/queryVideoClassify",
+        //     type: "post",
+        //     blockRequest:true,
+        //     blockName:"asd",
+        //     success: function (data) {
+        //         console.log(3);
+        //     }
+        // })
+        // ajaxProxy.blockReq({
+        //     url:"http://49.234.11.224/video/queryVideoClassify",
+        //     type: "post",
+        //     blockRequest:true,
+        //     blockName:"zxc",
+        //     success: function (data) {
+        //         console.log(4);
+        //     }
+        // })
+
+
+        // $.zjaxChain({
+        //     url:"http://49.234.11.224/video/queryVideoClassify",
+        //     type: "post",
+        //     success: function (data) {
+        //         console.log(data);
+        //     }
+        // }).zjaxChain({
+        //     url:"http://49.234.11.224/video/queryVideoClassify",
+        //     type: "post",
+        //     success: function (data) {
+        //         console.log(data);
+        //     }
+        // }).zjaxChain({
+        //     url:"http://49.234.11.224/video/queryVideoClassify",
+        //     type: "post",
+        //     success: function (data) {
+        //         console.log(data);
+        //     }
+        // }).invoke();
+
+
+    })
+</script>
+</html>
