@@ -246,6 +246,7 @@
                                 top: scrollTop,//scrollTop+top
                                 left: scrollLeft //scrollLeft+left
                             })
+                        //当遮罩绑定在body上时，是fixed，因为遮罩在body上要保持滚动时依然将整个网页遮罩。在dom上时要absolute，滚动时遮罩随着滚动
                         $dom.prepend($preloader.css("position", "absolute").fadeIn());
                     }
                 }
