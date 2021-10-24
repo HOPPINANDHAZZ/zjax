@@ -586,7 +586,7 @@
     /**
      * 手动执行链的zjax
      */
-    _Zjax.prototype.invoke = function () {
+    _Zjax.prototype.runZjax = function () {
         let me = this;
         me._debug("zjax请求链开始，请求链长度: " + me.requestChain.length);
         if (me.requestChain.length > 0)
