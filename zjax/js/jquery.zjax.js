@@ -6,6 +6,7 @@
  */
 ;(function () {
     "use strict";
+    console.log("\n %c zjax %c https://gitee.com/hoppin/hoppinzq-jquery-zjax \n\n","background: #35495e; padding: 1px; border-radius: 3px 0 0 3px; color: #fff","background: #fadfa3; padding: 1px; border-radius: 0 3px 3px 0; color: #fff");
     /**
      * js方法增强，用以替换织入Function原型的方法
      * @param {Object} originFun 原函数
